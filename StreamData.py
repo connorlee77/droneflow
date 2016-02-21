@@ -20,8 +20,9 @@ class StreamData:
 
 		if ret is False:
 			self.cap.release()
+			return ret
 
-		return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) / 255.0	
+		return ret, cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 	def close(self):
 		if self.cap.isOpened():
@@ -30,6 +31,8 @@ class StreamData:
 
 		return False
 
+	def getTime(self):
+		return self.cap.get(cv2.cv.CV_CAP_PROP_POS_MSEC)
 
 def printMatrix(mat):
 
