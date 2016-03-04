@@ -4,6 +4,15 @@ import cv2
 
 import StreamData as sd
 
+x_pix = 320
+y_pix = 240
+
+x_ang = np.radians(54.4)
+y_ang = np.radians(37.8)
+
+def getHeight():
+	return 3
+
 def track():
 	# params for ShiTomasi corner detection
 	feature_params = dict( maxCorners = 100,
@@ -27,6 +36,14 @@ def track():
 	i = 0
 	while ret is True:
 
+		h = getHeight()
+
+		xdist = (h * np.tan(x_ang / 2.0))
+		ydist = (h * np.tan(y_ang / 2.0)) 
+		
+		pix2mx = x_pix / xdist
+		pix2my = y_pix / ydist
+
 		# get new frame
 		ret, curr_frame = pipe.getFrame()
 		
@@ -41,10 +58,12 @@ def track():
 		# compute velocity components
 		assert good_new.shape == good_old.shape
 
+
+
 		vel = []
 		for x in range(len(good_new)):
-			xcomp = (good_new[x][1] - good_old[x][1]) / ((curr_time - prev_time) / 1000.0)
-			ycomp = (good_new[x][0] - good_old[x][0]) / ((curr_time - prev_time) / 1000.0)
+			xcomp = ((good_new[x][1] - good_old[x][1]) / x_pix) / ((curr_time - prev_time) / 1000.0) 
+			ycomp = ((good_new[x][0] - good_old[x][0]) / y_pix) / ((curr_time - prev_time) / 1000.0)
 			vel.append([xcomp, ycomp])
 
 		velocities[curr_time / 1000.0] = vel
@@ -54,7 +73,7 @@ def track():
 		new_points = prev_points
 		prev_time = curr_time
 
-		if i == 5:
+		if i == 300:
 			ret = False
 		i += 1
 	print velocities
